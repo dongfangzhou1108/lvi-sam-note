@@ -1,1 +1,36 @@
+featureExtraction:
+    功能：激光点云特征提取
+    输入：   去畸变点云
+    输出：   cloud_info用于mapOptimization
 
+
+
+imageProjection：
+    功能：激光点云去畸变
+    输入：   IMU原始数据   
+                imuHandler->    push_back队列
+            + IMU里程计(VINS)   
+                odometryHandler->    push_back队列
+            + 原始点云  
+                cloudHandler->    检查 点云 + IMU + odom(VINS)缓存 (IMU原始数据计算旋转增量,里程计数据计算平移增量+用于初始mapOptimization位姿)    
+                            ->    点云去畸变 (依旧没有利用平移信息)
+    输出：   cloud_info用于特征提取
+
+
+
+IMUPreintegration:
+    功能：优化IMU pvq + bias 状态
+    输入：   IMU原始数据
+                imuHandler->    push_back队列 + 发布高频IMU里程计位姿
+            + 激光建图里程计数据
+                odometryHandler->    IMU因子 + 先验pose因子 优化
+                               ->    根据优化后的bias重新计算预积分量 imuIntegratorOpt_ + imuIntegratorImu_
+                               ->    积分imuQueImu数据，用于输出高频IMU里程计位姿        
+
+
+
+mapOptmization：
+    功能：激光里程计
+    输入：   去畸变点云
+            +GPS
+            +VINS回环数据
