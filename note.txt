@@ -32,5 +32,9 @@ IMUPreintegration:
 mapOptmization：
     功能：激光里程计
     输入：   去畸变点云
+                laserCloudInfoHandler->    通过VINS增量计算初始位姿
+                                 ->    提取关键帧位姿相近+时间相近的点云,根据位姿变换转化submap并降采样,降采样当前帧
+                                 ->    scan to map L-M优化,融合IMU计算pitch和roll,分别堆roll pitch z轴运动设置阈值约束
+                                 ->    根据前后两帧运动阈值判断是否存为关键帧,如果不是关键帧则不进行接下来的因子图优化
             +GPS
             +VINS回环数据
